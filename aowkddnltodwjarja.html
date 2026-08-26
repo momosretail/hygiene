@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2A75BB">
 <meta name="format-detection" content="telephone=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,13 +12,15 @@
 <title>MOMOS 위생 점검</title>
 <style>
   :root{
-    --brand:#2A75BB; --brand-dark:#1B4E7E; --brand-wash:#EAF2FA;
-    --ink:#262220; --ink-2:#5D554F; --ink-3:#948A82;
-    --line:#E4DCD4; --ground:#FFFFFF; --surface:#FDFBFA; --surface-2:#F4F1EC;
-    --ok:#2E7D5B; --ok-bg:#E4F1EA;
-    --bad:#C2503F; --bad-bg:#FBE7E2;
-    --na:#8C837C; --na-bg:#EFEBE7;
-    --warn:#B8862B; --warn-bg:#FAF0D9;
+    --navy:#2B3A4A;                                   /* 브랜드바 — 시트와 동일 */
+    --brand:#2A75BB; --brand-dark:#1B4E7E; --brand-wash:#EDF4FB;
+    --ink:#1F2429; --ink-2:#5A636B; --ink-3:#949CA3;
+    --line:#E3E6E9; --line-strong:#CFD4D9;
+    --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F8;
+    --ok:#2E7D5B; --ok-bg:#E8F2EC;
+    --bad:#B23A2A; --bad-bg:#FBEAE7;
+    --na:#8A9199; --na-bg:#F1F3F5;
+    --warn:#A97B22; --warn-bg:#FBF2DE;
     --radius:12px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -35,7 +37,7 @@
 
   /* ---------- 공통 ---------- */
   .brandbar{
-    background:var(--brand); color:#fff; padding:14px 16px;
+    background:var(--navy); color:#fff; padding:14px 16px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
   .brandbar .logo{font-weight:800; letter-spacing:-.01em; font-size:15px;}
@@ -45,7 +47,7 @@
   label.fld{display:block; font-size:13px; font-weight:700; color:var(--ink-2); margin:18px 0 7px;}
   input[type=text], input[type=tel], input[type=date], textarea{
     width:100%; padding:12px 14px; font-size:16px; font-family:inherit;
-    border:1px solid var(--line); border-radius:10px; background:var(--ground); color:var(--ink);
+    border:1px solid var(--line-strong); border-radius:10px; background:var(--ground); color:var(--ink);
   }
   textarea{resize:vertical; min-height:64px; font-size:15px;}
   input:focus, textarea:focus{outline:2px solid var(--brand); outline-offset:1px; border-color:var(--brand);}
@@ -55,7 +57,7 @@
     font-family:inherit; cursor:pointer;
   }
   .btn:disabled{background:#C6CDD4; cursor:not-allowed;}
-  .btn.ghost{background:var(--ground); color:var(--ink-2); border:1px solid var(--line);}
+  .btn.ghost{background:var(--ground); color:var(--ink-2); border:1px solid var(--line-strong);}
   .msg{margin-top:14px; padding:11px 14px; border-radius:9px; font-size:14px; display:none;}
   .msg.show{display:block;}
   .msg.err{background:var(--bad-bg); color:var(--bad);}
@@ -64,7 +66,7 @@
   /* ---------- 매장 선택 ---------- */
   .stores{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .store{
-    padding:18px 10px; border:1.5px solid var(--line); border-radius:var(--radius);
+    padding:18px 10px; border:1.5px solid var(--line-strong); border-radius:var(--radius);
     background:var(--ground); font-size:16px; font-weight:700; color:var(--ink);
     font-family:inherit; cursor:pointer; text-align:center;
   }
@@ -74,7 +76,7 @@
   .cycles{display:flex; flex-direction:column; gap:12px;}
   .cycle{
     display:flex; align-items:center; gap:14px; width:100%; text-align:left;
-    padding:18px 16px; border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 16px; border:1px solid var(--line-strong); border-radius:var(--radius);
     background:var(--ground); font-family:inherit; cursor:pointer; color:var(--ink);
   }
   .cycle .ico{
@@ -100,7 +102,7 @@
   .bar{height:5px; background:var(--surface-2); border-radius:99px; margin-top:9px; overflow:hidden;}
   .bar i{display:block; height:100%; width:0; background:var(--brand); transition:width .2s ease;}
 
-  .sec{margin:14px 16px; border:1px solid var(--line); border-radius:var(--radius);
+  .sec{margin:14px 16px; border:1px solid var(--line-strong); border-radius:var(--radius);
        background:var(--ground); overflow:hidden;}
   .sec > h3{
     margin:0; padding:13px 15px; background:var(--surface-2);
@@ -113,7 +115,7 @@
     font-family:inherit; cursor:pointer;
   }
   .item{padding:13px 15px; border-top:1px solid var(--line);}
-  .item.unset{background:#FFFDF6;}
+  .item.unset{background:#F7FAFD;}
   .item .q{font-size:14.5px; line-height:1.5; margin-bottom:10px;}
   .item .q .law{
     display:inline-block; font-size:10.5px; font-weight:800; color:#fff; background:var(--bad);
@@ -122,7 +124,7 @@
   .item .q .id{font-size:11px; color:var(--ink-3); margin-right:5px; font-variant-numeric:tabular-nums;}
   .seg{display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px;}
   .seg button{
-    padding:11px 4px; border:1.5px solid var(--line); border-radius:9px; background:var(--ground);
+    padding:11px 4px; border:1.5px solid var(--line-strong); border-radius:9px; background:var(--ground);
     font-size:14px; font-weight:700; font-family:inherit; color:var(--ink-2); cursor:pointer;
   }
   .seg button[aria-pressed="true"][data-v="O"]{background:var(--ok-bg); border-color:var(--ok); color:var(--ok);}
@@ -174,7 +176,7 @@
   <div class="brandbar"><span class="logo">MOMOS COFFEE</span><span class="who">바리스타팀 위생 점검</span></div>
   <div class="pad">
     <h1>매장을 선택해 주세요</h1>
-    <p class="desc">점장에게 전달받은 매장 코드가 필요합니다.</p>
+    <p class="desc">앱 담당자로부터 전달받은 매장 코드가 필요합니다.</p>
 
     <div class="stores" id="stores"></div>
 
@@ -253,7 +255,8 @@
  *  MOMOS 위생 점검 · GitHub Pages 프런트
  *  ▼▼▼ 아래 한 줄만 본인의 Apps Script 배포 주소(/exec)로 바꾸세요 ▼▼▼
  * ================================================================== */
-var API_URL = 'https://script.google.com/macros/s/AKfycbyWN9kNtLHQbuUDJGKEIrD2CDjj83OPzBN7LApxlThY1idO3AQg9Fmtk9xyi2PlLC5J/exec';/* ================================================================== */
+var API_URL = 'https://script.google.com/macros/s/AKfycbyWN9kNtLHQbuUDJGKEIrD2CDjj83OPzBN7LApxlThY1idO3AQg9Fmtk9xyi2PlLC5J/exec';
+/* ================================================================== */
 
 var 상태 = { 매장:'', 코드:'', 담당자:'', 주기:'', 오늘:'', 항목:[], 답:{}, 시작:0, 초기:null };
 
