@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>MOMOS 위생 점검</title>
+<style>
+  :root{
+    --brand:#2A75BB; --brand-dark:#1B4E7E; --brand-wash:#EAF2FA;
+    --ink:#262220; --ink-2:#5D554F; --ink-3:#948A82;
+    --line:#E4DCD4; --ground:#FFFFFF; --surface:#FDFBFA; --surface-2:#F4F1EC;
+    --ok:#2E7D5B; --ok-bg:#E4F1EA;
+    --bad:#C2503F; --bad-bg:#FBE7E2;
+    --na:#8C837C; --na-bg:#EFEBE7;
+    --warn:#B8862B; --warn-bg:#FAF0D9;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--surface); color:var(--ink);
+    font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,
+                "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .screen{display:none;} .screen.on{display:block;}
+  .pad{padding:20px 16px 24px; max-width:720px; margin:0 auto;}
+
+  /* ---------- 공통 ---------- */
+  .brandbar{
+    background:var(--brand); color:#fff; padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .brandbar .logo{font-weight:800; letter-spacing:-.01em; font-size:15px;}
+  .brandbar .who{font-size:12.5px; opacity:.9;}
+  h1{font-size:20px; font-weight:800; margin:0 0 6px; letter-spacing:-.02em;}
+  .desc{color:var(--ink-2); font-size:14px; margin:0 0 20px;}
+  label.fld{display:block; font-size:13px; font-weight:700; color:var(--ink-2); margin:18px 0 7px;}
+  input[type=text], input[type=tel], input[type=date], textarea{
+    width:100%; padding:12px 14px; font-size:16px; font-family:inherit;
+    border:1px solid var(--line); border-radius:10px; background:var(--ground); color:var(--ink);
+  }
+  textarea{resize:vertical; min-height:64px; font-size:15px;}
+  input:focus, textarea:focus{outline:2px solid var(--brand); outline-offset:1px; border-color:var(--brand);}
+  .btn{
+    display:block; width:100%; padding:15px; border:0; border-radius:11px;
+    background:var(--brand); color:#fff; font-size:16px; font-weight:700;
+    font-family:inherit; cursor:pointer;
+  }
+  .btn:disabled{background:#C6CDD4; cursor:not-allowed;}
+  .btn.ghost{background:var(--ground); color:var(--ink-2); border:1px solid var(--line);}
+  .msg{margin-top:14px; padding:11px 14px; border-radius:9px; font-size:14px; display:none;}
+  .msg.show{display:block;}
+  .msg.err{background:var(--bad-bg); color:var(--bad);}
+  .msg.warn{background:var(--warn-bg); color:var(--warn);}
+
+  /* ---------- 매장 선택 ---------- */
+  .stores{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .store{
+    padding:18px 10px; border:1.5px solid var(--line); border-radius:var(--radius);
+    background:var(--ground); font-size:16px; font-weight:700; color:var(--ink);
+    font-family:inherit; cursor:pointer; text-align:center;
+  }
+  .store[aria-pressed="true"]{border-color:var(--brand); background:var(--brand-wash); color:var(--brand-dark);}
+
+  /* ---------- 주기 메뉴 ---------- */
+  .cycles{display:flex; flex-direction:column; gap:12px;}
+  .cycle{
+    display:flex; align-items:center; gap:14px; width:100%; text-align:left;
+    padding:18px 16px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--ground); font-family:inherit; cursor:pointer; color:var(--ink);
+  }
+  .cycle .ico{
+    width:42px; height:42px; flex:0 0 42px; border-radius:11px; background:var(--brand-wash);
+    color:var(--brand-dark); display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:15px;
+  }
+  .cycle .t{flex:1; min-width:0;}
+  .cycle .t b{display:block; font-size:16px; font-weight:800;}
+  .cycle .t span{font-size:12.5px; color:var(--ink-3);}
+  .cycle .st{font-size:12px; font-weight:700; padding:4px 9px; border-radius:99px; white-space:nowrap;}
+  .cycle .st.done{background:var(--ok-bg); color:var(--ok);}
+  .cycle .st.todo{background:var(--surface-2); color:var(--ink-3);}
+
+  /* ---------- 점검 화면 ---------- */
+  .sticky-top{
+    position:sticky; top:0; z-index:20; background:var(--ground);
+    border-bottom:1px solid var(--line); padding:10px 16px 12px;
+  }
+  .sticky-top .row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .sticky-top .ttl{font-size:14px; font-weight:800;}
+  .sticky-top .cnt{font-size:13px; color:var(--ink-3); font-variant-numeric:tabular-nums;}
+  .bar{height:5px; background:var(--surface-2); border-radius:99px; margin-top:9px; overflow:hidden;}
+  .bar i{display:block; height:100%; width:0; background:var(--brand); transition:width .2s ease;}
+
+  .sec{margin:14px 16px; border:1px solid var(--line); border-radius:var(--radius);
+       background:var(--ground); overflow:hidden;}
+  .sec > h3{
+    margin:0; padding:13px 15px; background:var(--surface-2);
+    font-size:14.5px; font-weight:800; display:flex; align-items:center; gap:9px;
+  }
+  .sec > h3 .n{font-size:12px; font-weight:700; color:var(--ink-3); font-variant-numeric:tabular-nums;}
+  .sec > h3 .allo{
+    margin-left:auto; font-size:12px; font-weight:700; padding:6px 11px; border-radius:99px;
+    border:1px solid var(--line); background:var(--ground); color:var(--brand-dark);
+    font-family:inherit; cursor:pointer;
+  }
+  .item{padding:13px 15px; border-top:1px solid var(--line);}
+  .item.unset{background:#FFFDF6;}
+  .item .q{font-size:14.5px; line-height:1.5; margin-bottom:10px;}
+  .item .q .law{
+    display:inline-block; font-size:10.5px; font-weight:800; color:#fff; background:var(--bad);
+    padding:1px 6px; border-radius:4px; margin-right:6px; vertical-align:1.5px; letter-spacing:.02em;
+  }
+  .item .q .id{font-size:11px; color:var(--ink-3); margin-right:5px; font-variant-numeric:tabular-nums;}
+  .seg{display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px;}
+  .seg button{
+    padding:11px 4px; border:1.5px solid var(--line); border-radius:9px; background:var(--ground);
+    font-size:14px; font-weight:700; font-family:inherit; color:var(--ink-2); cursor:pointer;
+  }
+  .seg button[aria-pressed="true"][data-v="O"]{background:var(--ok-bg); border-color:var(--ok); color:var(--ok);}
+  .seg button[aria-pressed="true"][data-v="X"]{background:var(--bad-bg); border-color:var(--bad); color:var(--bad);}
+  .seg button[aria-pressed="true"][data-v="N/A"]{background:var(--na-bg); border-color:var(--na); color:var(--na);}
+  .why{display:none; margin-top:11px; padding:12px; background:var(--bad-bg); border-radius:9px;}
+  .why.on{display:block;}
+  .why label{display:block; font-size:12.5px; font-weight:700; color:var(--bad); margin-bottom:6px;}
+  .photo{display:flex; align-items:center; gap:10px; margin-top:9px; flex-wrap:wrap;}
+  .photo input{display:none;}
+  .photo .pick{
+    font-size:13px; font-weight:700; padding:8px 13px; border-radius:8px;
+    border:1px solid var(--bad); color:var(--bad); background:var(--ground);
+    font-family:inherit; cursor:pointer;
+  }
+  .photo .name{font-size:12px; color:var(--ink-2); word-break:break-all;}
+  .photo img{width:52px; height:52px; object-fit:cover; border-radius:7px; border:1px solid var(--line);}
+
+  .sticky-bot{
+    position:sticky; bottom:0; z-index:20; background:var(--ground);
+    border-top:1px solid var(--line); padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+  }
+  .hint{font-size:12.5px; color:var(--ink-3); text-align:center; margin:0 0 9px;}
+  .hint.alert{color:var(--bad); font-weight:700;}
+
+  /* ---------- 완료 ---------- */
+  .done-ico{
+    width:64px; height:64px; border-radius:50%; background:var(--ok-bg); color:var(--ok);
+    display:flex; align-items:center; justify-content:center; font-size:30px; margin:8px auto 18px;
+  }
+  .sum{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);
+       border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:18px 0;}
+  .sum div{background:var(--ground); padding:14px 8px; text-align:center;}
+  .sum b{display:block; font-size:24px; font-weight:800; font-variant-numeric:tabular-nums;}
+  .sum span{font-size:12px; color:var(--ink-3);}
+
+  .load{display:none; text-align:center; padding:40px 16px; color:var(--ink-3); font-size:14px;}
+  .load.on{display:block;}
+  .spin{width:26px; height:26px; border:3px solid var(--line); border-top-color:var(--brand);
+        border-radius:50%; margin:0 auto 12px; animation:sp .8s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion:reduce){ .spin{animation:none;} .bar i{transition:none;} }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. 로그인 ============ -->
+<div class="screen on" id="s-login">
+  <div class="brandbar"><span class="logo">MOMOS COFFEE</span><span class="who">바리스타팀 위생 점검</span></div>
+  <div class="pad">
+    <h1>매장을 선택해 주세요</h1>
+    <p class="desc">점장에게 전달받은 매장 코드가 필요합니다.</p>
+
+    <div class="stores" id="stores"></div>
+
+    <label class="fld" for="code">매장 코드</label>
+    <input type="tel" id="code" inputmode="numeric" maxlength="8" placeholder="4자리 숫자" autocomplete="off">
+
+    <label class="fld" for="name">담당자 이름</label>
+    <input type="text" id="name" placeholder="예: 이언주" autocomplete="off">
+
+    <div style="height:22px"></div>
+    <button class="btn" id="btn-login">시작하기</button>
+    <div class="msg err" id="login-msg"></div>
+  </div>
+</div>
+
+<!-- ============ 2. 주기 선택 ============ -->
+<div class="screen" id="s-menu">
+  <div class="brandbar">
+    <span class="logo" id="menu-store">—</span>
+    <span class="who" id="menu-name">—</span>
+  </div>
+  <div class="pad">
+    <h1>어떤 점검을 하시겠습니까?</h1>
+    <p class="desc" id="menu-date">—</p>
+    <div class="cycles" id="cycles"></div>
+    <div style="height:26px"></div>
+    <button class="btn ghost" id="btn-logout">매장 변경</button>
+  </div>
+</div>
+
+<!-- ============ 3. 점검 ============ -->
+<div class="screen" id="s-check">
+  <div class="sticky-top">
+    <div class="row">
+      <span class="ttl" id="chk-title">—</span>
+      <span class="cnt" id="chk-count">0 / 0</span>
+    </div>
+    <div class="bar"><i id="chk-bar"></i></div>
+  </div>
+
+  <div class="load on" id="chk-load"><div class="spin"></div>점검 항목을 불러오는 중…</div>
+  <div id="chk-body"></div>
+
+  <div class="pad" id="chk-note" style="display:none; padding-top:4px;">
+    <label class="fld" for="note">전체 특이사항 (선택)</label>
+    <textarea id="note" placeholder="교대 인수인계 사항, 다음 점검자에게 남길 메모 등"></textarea>
+  </div>
+
+  <div class="sticky-bot" id="chk-foot" style="display:none;">
+    <p class="hint" id="chk-hint">—</p>
+    <button class="btn" id="btn-submit" disabled>제출하기</button>
+    <div style="height:8px"></div>
+    <button class="btn ghost" id="btn-back">뒤로</button>
+    <div class="msg err" id="chk-msg"></div>
+  </div>
+</div>
+
+<!-- ============ 4. 완료 ============ -->
+<div class="screen" id="s-done">
+  <div class="brandbar"><span class="logo">MOMOS COFFEE</span><span class="who">제출 완료</span></div>
+  <div class="pad" style="text-align:center;">
+    <div class="done-ico">✓</div>
+    <h1 id="done-title">점검이 기록되었습니다</h1>
+    <p class="desc" id="done-sub">—</p>
+    <div class="sum">
+      <div><b id="d-o" style="color:var(--ok)">0</b><span>이행</span></div>
+      <div><b id="d-x" style="color:var(--bad)">0</b><span>미이행</span></div>
+      <div><b id="d-n" style="color:var(--na)">0</b><span>해당없음</span></div>
+    </div>
+    <button class="btn" id="btn-home">처음으로</button>
+  </div>
+</div>
+
+<script>
+/* ==================================================================
+ *  MOMOS 위생 점검 · GitHub Pages 프런트
+ *  ▼▼▼ 아래 한 줄만 본인의 Apps Script 배포 주소(/exec)로 바꾸세요 ▼▼▼
+ * ================================================================== */
+var API_URL = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+/* ================================================================== */
+
+var 상태 = { 매장:'', 코드:'', 담당자:'', 주기:'', 오늘:'', 항목:[], 답:{}, 시작:0, 초기:null };
+
+function $(id){ return document.getElementById(id); }
+function 화면(id){
+  var l = document.querySelectorAll('.screen');
+  for (var i=0;i<l.length;i++) l[i].classList.remove('on');
+  $(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function 알림(el, txt, 종류){
+  el.textContent = txt || '';
+  el.className = 'msg ' + (종류 || 'err') + (txt ? ' show' : '');
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function 대기(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+/* ==================== 통신 계층 ====================
+ * 조회 : JSONP  — CORS 자체가 적용되지 않아 어떤 브라우저에서도 동작
+ * 저장 : POST(text/plain) — 프리플라이트를 발생시키지 않는 형식
+ *        실패 시 no-cors 재전송 + 제출번호로 저장 여부 확인
+ * ================================================== */
+var 콜백번호 = 0;
+
+function 조회(params){
+  return new Promise(function(resolve, reject){
+    if (!API_URL || API_URL.indexOf('PASTE_') === 0){
+      return reject(new Error('API 주소가 설정되지 않았습니다. index.html의 API_URL을 확인하세요.'));
+    }
+    콜백번호++;
+    var cb = '__momos_cb_' + 콜백번호 + '_' + Math.floor(Math.random()*1e6);
+    var s = document.createElement('script');
+    var timer = setTimeout(function(){ 정리(); reject(new Error('서버 응답이 없습니다. 잠시 후 다시 시도해 주세요.')); }, 25000);
+
+    function 정리(){
+      clearTimeout(timer);
+      try { delete window[cb]; } catch(e){ window[cb] = undefined; }
+      if (s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[cb] = function(res){ 정리(); resolve(res); };
+
+    var q = [];
+    for (var k in params){
+      if (params.hasOwnProperty(k)) q.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+    }
+    q.push('callback=' + cb);
+    s.src = API_URL + '?' + q.join('&');
+    s.onerror = function(){ 정리(); reject(new Error('서버에 연결하지 못했습니다. 네트워크를 확인해 주세요.')); };
+    document.head.appendChild(s);
+  });
+}
+
+function 저장(payload){
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  }).then(function(r){ return r.json(); });
+}
+
+/** 응답을 읽지 못하는 환경에서의 최후 수단: 던져놓고 저장 여부를 되묻는다 */
+function 저장_후확인(payload){
+  return fetch(API_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).then(function(){
+    return 확인_반복(payload, 4);
+  });
+}
+
+function 확인_반복(payload, 남은){
+  if (남은 <= 0) return Promise.resolve({ ok:false, msg:'저장 여부를 확인하지 못했습니다. 잠시 후 메뉴에서 완료 표시를 확인해 주세요.' });
+  return 대기(2500).then(function(){
+    return 조회({ action:'check', 매장:payload.매장, 코드:payload.코드, 제출번호:payload.제출번호 });
+  }).then(function(res){
+    if (res && res.ok && res.저장됨) return { ok:true, 확인됨:true };
+    return 확인_반복(payload, 남은 - 1);
+  }).catch(function(){
+    return 확인_반복(payload, 남은 - 1);
+  });
+}
+
+function 제출번호생성(){
+  return 'S' + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36);
+}
+
+/* ===================== 초기 로딩 ===================== */
+조회({ action:'init' }).then(function(info){
+  if (!info || !info.ok) throw new Error((info && info.msg) || '초기 정보를 받지 못했습니다.');
+  상태.초기 = info;
+  var box = $('stores');
+  box.innerHTML = '';
+  info.매장.forEach(function(m){
+    var b = document.createElement('button');
+    b.className = 'store'; b.type = 'button';
+    b.textContent = m; b.setAttribute('aria-pressed','false');
+    b.onclick = function(){
+      var all = box.querySelectorAll('.store');
+      for (var i=0;i<all.length;i++) all[i].setAttribute('aria-pressed','false');
+      b.setAttribute('aria-pressed','true');
+      상태.매장 = m;
+    };
+    box.appendChild(b);
+  });
+  기억복원();
+}).catch(function(err){
+  알림($('login-msg'), err.message);
+});
+
+function 기억복원(){
+  try{
+    var m = localStorage.getItem('momos_store');
+    var n = localStorage.getItem('momos_name');
+    var c = localStorage.getItem('momos_code');
+    if (m){
+      var all = $('stores').querySelectorAll('.store');
+      for (var i=0;i<all.length;i++){
+        if (all[i].textContent === m){ all[i].setAttribute('aria-pressed','true'); 상태.매장 = m; }
+      }
+    }
+    if (n) $('name').value = n;
+    if (c) $('code').value = c;
+  }catch(e){ /* 저장소 접근 불가 시 무시 */ }
+}
+
+/* ===================== 로그인 ===================== */
+$('btn-login').onclick = function(){
+  var 코드 = $('code').value.trim();
+  var 이름 = $('name').value.trim();
+  알림($('login-msg'), '');
+
+  if (!상태.매장) return 알림($('login-msg'), '매장을 선택해 주세요.');
+  if (!코드)      return 알림($('login-msg'), '매장 코드를 입력해 주세요.');
+  if (!이름)      return 알림($('login-msg'), '담당자 이름을 입력해 주세요.');
+
+  var btn = this;
+  btn.disabled = true; btn.textContent = '확인 중…';
+
+  조회({ action:'login', 매장:상태.매장, 코드:코드 }).then(function(res){
+    btn.disabled = false; btn.textContent = '시작하기';
+    if (!res.ok) return 알림($('login-msg'), res.msg);
+    상태.코드 = 코드;
+    상태.담당자 = 이름;
+    상태.오늘 = res.오늘;
+    try{
+      localStorage.setItem('momos_store', 상태.매장);
+      localStorage.setItem('momos_name', 이름);
+      localStorage.setItem('momos_code', 코드);
+    }catch(e){}
+    메뉴열기();
+  }).catch(function(err){
+    btn.disabled = false; btn.textContent = '시작하기';
+    알림($('login-msg'), err.message);
+  });
+};
+
+$('btn-logout').onclick = function(){ 화면('s-login'); };
+$('btn-home').onclick   = function(){ 메뉴열기(); };
+$('btn-back').onclick   = function(){
+  if (confirm('입력한 내용이 사라집니다. 나가시겠습니까?')) 메뉴열기();
+};
+
+/* ===================== 주기 메뉴 ===================== */
+function 메뉴열기(){
+  $('menu-store').textContent = 상태.매장;
+  $('menu-name').textContent  = 상태.담당자;
+  $('menu-date').textContent  = (상태.오늘 || '') + ' 점검';
+
+  var box = $('cycles');
+  box.innerHTML = '';
+  var 설명 = { '일일':'매일 영업 전·후 점검', '주간':'주 1회 심화 점검', '월간':'월 1회 설비·기록 점검' };
+
+  ['일일','주간','월간'].forEach(function(주기){
+    var b = document.createElement('button');
+    b.className = 'cycle'; b.type = 'button';
+    b.innerHTML =
+      '<span class="ico">' + esc(주기) + '</span>' +
+      '<span class="t"><b>' + esc(주기) + ' 점검</b><span>' + esc(설명[주기]) + '</span></span>' +
+      '<span class="st todo" id="st-' + 주기 + '">확인 중…</span>';
+    b.onclick = function(){ 점검열기(주기); };
+    box.appendChild(b);
+  });
+
+  화면('s-menu');
+
+  조회({ action:'today', 매장:상태.매장, 코드:상태.코드 }).then(function(res){
+    if (res && res.오늘){
+      상태.오늘 = res.오늘;
+      $('menu-date').textContent = res.오늘 + ' 점검';
+    }
+    ['일일','주간','월간'].forEach(function(주기){
+      var el = $('st-' + 주기);
+      if (!el) return;
+      var 기록 = (res && res.ok && res.현황) ? res.현황[주기] : null;
+      if (기록){ el.className = 'st done'; el.textContent = '오늘 ' + 기록.시각 + ' 완료'; }
+      else     { el.className = 'st todo'; el.textContent = '시작'; }
+    });
+  }).catch(function(){
+    ['일일','주간','월간'].forEach(function(주기){
+      var el = $('st-' + 주기);
+      if (el){ el.className = 'st todo'; el.textContent = '시작'; }
+    });
+  });
+}
+
+/* ===================== 점검 화면 ===================== */
+function 점검열기(주기){
+  상태.주기 = 주기;
+  상태.답 = {};
+  상태.항목 = [];
+  $('chk-title').textContent = 상태.매장 + ' · ' + 주기 + ' 점검';
+  $('chk-body').innerHTML = '';
+  $('chk-load').classList.add('on');
+  $('chk-foot').style.display = 'none';
+  $('chk-note').style.display = 'none';
+  $('note').value = '';
+  알림($('chk-msg'), '');
+  화면('s-check');
+
+  조회({ action:'load', 주기:주기, 매장:상태.매장, 코드:상태.코드 }).then(function(data){
+    $('chk-load').classList.remove('on');
+    if (!data.ok) throw new Error(data.msg || '항목을 받지 못했습니다.');
+    상태.오늘 = data.오늘;
+    항목그리기(data);
+    if (data.이미제출){
+      알림($('chk-msg'),
+        '오늘 ' + data.이미제출.시각 + '에 ' + data.이미제출.담당자 +
+        '님이 이미 제출했습니다. 추가 제출도 기록됩니다.', 'warn');
+    }
+  }).catch(function(err){
+    $('chk-load').classList.remove('on');
+    $('chk-body').innerHTML =
+      '<div class="pad"><div class="msg err show">' + esc(err.message) + '</div></div>';
+  });
+}
+
+function 항목그리기(data){
+  var body = $('chk-body');
+  body.innerHTML = '';
+  상태.항목 = [];
+
+  data.섹션.forEach(function(그룹){
+    상태.항목 = 상태.항목.concat(그룹.항목);
+
+    var sec = document.createElement('div');
+    sec.className = 'sec';
+
+    var h = document.createElement('h3');
+    h.innerHTML = esc(그룹.섹션) + ' <span class="n">' + 그룹.항목.length + '개</span>';
+    var allo = document.createElement('button');
+    allo.type = 'button'; allo.className = 'allo'; allo.textContent = '이 섹션 전체 O';
+    allo.onclick = function(){ 그룹.항목.forEach(function(a){ 선택(a.id, 'O'); }); };
+    h.appendChild(allo);
+    sec.appendChild(h);
+
+    그룹.항목.forEach(function(a){ sec.appendChild(항목행(a)); });
+    body.appendChild(sec);
+  });
+
+  $('chk-note').style.display = '';
+  $('chk-foot').style.display = '';
+  상태.시작 = Date.now();
+  갱신();
+}
+
+function 항목행(a){
+  var wrap = document.createElement('div');
+  wrap.className = 'item unset';
+  wrap.id = 'item-' + a.id;
+
+  var q = document.createElement('div');
+  q.className = 'q';
+  q.innerHTML = '<span class="id">' + esc(a.id) + '</span>' +
+                (a.법적 ? '<span class="law">법적</span>' : '') +
+                esc(a.내용);
+  wrap.appendChild(q);
+
+  var seg = document.createElement('div');
+  seg.className = 'seg';
+  [['O','이행'],['X','미이행'],['N/A','해당없음']].forEach(function(p){
+    var b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('data-v', p[0]);
+    b.textContent = p[1]; b.setAttribute('aria-pressed','false');
+    b.onclick = function(){ 선택(a.id, p[0]); };
+    seg.appendChild(b);
+  });
+  wrap.appendChild(seg);
+
+  var why = document.createElement('div');
+  why.className = 'why'; why.id = 'why-' + a.id;
+  why.innerHTML =
+    '<label for="rs-' + a.id + '">미이행 사유 · 조치 계획 (필수)</label>' +
+    '<textarea id="rs-' + a.id + '" placeholder="예: 서랍장 측면 먼지 확인. 마감 시 전체 닦기 예정"></textarea>' +
+    '<div class="photo">' +
+      '<input type="file" accept="image/*" capture="environment">' +
+      '<button type="button" class="pick">사진 첨부</button>' +
+      '<span class="name"></span>' +
+      '<img alt="" style="display:none">' +
+    '</div>';
+  wrap.appendChild(why);
+
+  var pick = why.querySelector('.pick');
+  var file = why.querySelector('input[type=file]');
+  why.querySelector('textarea').oninput = function(){ 갱신(); };
+  pick.onclick = function(){ file.click(); };
+  file.onchange = function(){ 사진처리(a.id, file, why); };
+
+  return wrap;
+}
+
+function 선택(id, 값){
+  상태.답[id] = 상태.답[id] || {};
+  상태.답[id].값 = 값;
+
+  var wrap = $('item-' + id);
+  var btns = wrap.querySelectorAll('.seg button');
+  for (var i=0;i<btns.length;i++){
+    btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-v') === 값 ? 'true' : 'false');
+  }
+  wrap.classList.remove('unset');
+  $('why-' + id).classList.toggle('on', 값 === 'X');
+  갱신();
+}
+
+function 사진처리(id, input, why){
+  var f = input.files && input.files[0];
+  if (!f) return;
+  var 라벨 = why.querySelector('.name');
+  var 썸네일 = why.querySelector('img');
+  라벨.textContent = '처리 중…';
+
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function(){
+      var 최대 = 1280;
+      var w = img.width, h = img.height;
+      if (w > 최대 || h > 최대){
+        if (w > h){ h = Math.round(h * 최대 / w); w = 최대; }
+        else      { w = Math.round(w * 최대 / h); h = 최대; }
+      }
+      var cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      var url = cv.toDataURL('image/jpeg', 0.7);
+
+      상태.답[id] = 상태.답[id] || {};
+      상태.답[id].사진 = { data: url.split(',')[1], mime: 'image/jpeg', name: f.name };
+
+      썸네일.src = url; 썸네일.style.display = '';
+      라벨.textContent = Math.round(url.length * 0.75 / 1024) + 'KB';
+    };
+    img.onerror = function(){ 라벨.textContent = '이미지를 읽지 못했습니다'; };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+
+function 갱신(){
+  var 총 = 상태.항목.length;
+  var 완료 = 0, 미체크 = [], 사유없음 = [];
+
+  상태.항목.forEach(function(a){
+    var d = 상태.답[a.id];
+    if (!d || !d.값){ 미체크.push(a); return; }
+    완료++;
+    if (d.값 === 'X'){
+      var el = $('rs-' + a.id);
+      if (!el || !el.value.trim()) 사유없음.push(a);
+    }
+  });
+
+  $('chk-count').textContent = 완료 + ' / ' + 총;
+  $('chk-bar').style.width = 총 ? (완료 / 총 * 100) + '%' : '0%';
+
+  var hint = $('chk-hint');
+  var btn = $('btn-submit');
+
+  if (미체크.length){
+    hint.className = 'hint';
+    hint.textContent = '체크하지 않은 항목 ' + 미체크.length + '건이 남았습니다';
+    btn.disabled = true;
+  } else if (사유없음.length){
+    hint.className = 'hint alert';
+    hint.textContent = '미이행 항목 ' + 사유없음.length + '건의 사유를 입력해 주세요';
+    btn.disabled = true;
+  } else {
+    hint.className = 'hint';
+    hint.textContent = '모든 항목 확인 완료';
+    btn.disabled = false;
+  }
+}
+
+/* ===================== 제출 ===================== */
+$('btn-submit').onclick = function(){
+  var btn = this;
+  알림($('chk-msg'), '');
+
+  var 결과 = 상태.항목.map(function(a){
+    var d = 상태.답[a.id] || {};
+    var 사유el = $('rs-' + a.id);
+    return {
+      id: a.id, 섹션: a.섹션, 내용: a.내용, 값: d.값,
+      사유: (d.값 === 'X' && 사유el) ? 사유el.value.trim() : '',
+      사진: (d.값 === 'X' && d.사진) ? d.사진 : null
+    };
+  });
+
+  var 용량 = 0;
+  결과.forEach(function(r){ if (r.사진 && r.사진.data) 용량 += r.사진.data.length; });
+  if (용량 > 6 * 1024 * 1024){
+    return 알림($('chk-msg'), '첨부한 사진 용량이 너무 큽니다. 사진을 일부 빼고 다시 제출해 주세요.');
+  }
+
+  var payload = {
+    action: 'submit',
+    제출번호: 제출번호생성(),
+    주기: 상태.주기,
+    매장: 상태.매장,
+    코드: 상태.코드,
+    담당자: 상태.담당자,
+    점검일: 상태.오늘,
+    소요초: Math.round((Date.now() - 상태.시작) / 1000),
+    결과: 결과,
+    특이사항: $('note').value.trim()
+  };
+
+  var 집계 = {
+    O: 결과.filter(function(r){ return r.값 === 'O'; }).length,
+    X: 결과.filter(function(r){ return r.값 === 'X'; }).length,
+    N: 결과.filter(function(r){ return r.값 === 'N/A'; }).length
+  };
+
+  btn.disabled = true; btn.textContent = '제출 중…';
+
+  저장(payload).catch(function(){
+    알림($('chk-msg'), '응답이 늦어 재확인 중입니다. 창을 닫지 마세요…', 'warn');
+    return 저장_후확인(payload);
+  }).then(function(res){
+    btn.disabled = false; btn.textContent = '제출하기';
+    if (!res || !res.ok) return 알림($('chk-msg'), (res && res.msg) || '저장에 실패했습니다. 다시 시도해 주세요.');
+    완료화면(res, 집계);
+  }).catch(function(err){
+    btn.disabled = false; btn.textContent = '제출하기';
+    알림($('chk-msg'), '전송 실패: ' + err.message + ' — 네트워크 확인 후 다시 눌러주세요.');
+  });
+};
+
+function 완료화면(res, 집계){
+  var o = (typeof res.이행 === 'number') ? res.이행 : 집계.O;
+  var x = (typeof res.미이행 === 'number') ? res.미이행 : 집계.X;
+  var n = (typeof res.해당없음 === 'number') ? res.해당없음 : 집계.N;
+  var 율 = (typeof res.이행률 === 'number') ? res.이행률
+          : ((o + x) > 0 ? Math.round(o / (o + x) * 1000) / 10 : null);
+
+  $('d-o').textContent = o;
+  $('d-x').textContent = x;
+  $('d-n').textContent = n;
+  $('done-title').textContent = 상태.주기 + ' 점검이 기록되었습니다';
+  $('done-sub').textContent =
+    상태.매장 + ' · ' + 상태.오늘 + ' · ' + 상태.담당자 +
+    (율 !== null ? '  |  이행률 ' + 율 + '%' : '');
+  화면('s-done');
+}
+</script>
+</body>
+</html>
