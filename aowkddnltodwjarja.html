@@ -10,9 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="위생점검">
 <title>MOMOS 위생 점검</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root{
     /* ── 장비관리 시스템(equipmentmanagement)과 동일한 팔레트 ── */
@@ -28,8 +28,9 @@
     --shadow-sm:0 1px 4px rgba(31,110,183,.07);
     --shadow:0 2px 12px rgba(31,110,183,.10);
     --radius:10px;
-    --sans:'Noto Sans KR',-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-    --mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,
+           "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    --mono:var(--sans);            /* 숫자도 같은 서체 · 폭만 tabular 로 맞춤 */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
@@ -107,7 +108,7 @@
   }
   .sticky-top .row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
   .sticky-top .ttl{font-size:14px; font-weight:800;}
-  .sticky-top .cnt{font-size:13px; color:var(--ink-3); font-family:var(--mono);}
+  .sticky-top .cnt{font-size:13px; color:var(--ink-3); font-variant-numeric:tabular-nums;}
   .bar{height:5px; background:var(--surface-2); border-radius:99px; margin-top:9px; overflow:hidden;}
   .bar i{display:block; height:100%; width:0; background:var(--brand); transition:width .2s ease;}
 
@@ -131,7 +132,8 @@
     display:inline-block; font-size:10px; font-weight:600; color:var(--bad); background:var(--bad-bg);
     padding:2px 8px; border-radius:10px; margin-right:6px; vertical-align:1px; letter-spacing:.02em;
   }
-  .item .q .id{font-size:11px; color:var(--ink-3); margin-right:5px; font-family:var(--mono);}
+  .item .q .id{font-size:11px; color:var(--ink-3); margin-right:5px;
+               font-variant-numeric:tabular-nums; letter-spacing:.02em;}
   .seg{display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px;}
   .seg button{
     padding:11px 4px; border:1.5px solid var(--line-strong); border-radius:9px; background:var(--ground);
@@ -168,7 +170,8 @@
   .sum{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);
        border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:18px 0;}
   .sum div{background:var(--ground); padding:14px 8px; text-align:center;}
-  .sum b{display:block; font-size:24px; font-weight:700; font-family:var(--mono);}
+  .sum b{display:block; font-size:25px; font-weight:800; letter-spacing:-.02em;
+         font-variant-numeric:tabular-nums;}
   .sum span{font-size:12px; color:var(--ink-3);}
 
   .load{display:none; text-align:center; padding:40px 16px; color:var(--ink-3); font-size:14px;}
@@ -192,23 +195,23 @@
         padding:16px; margin-bottom:18px; box-shadow:var(--shadow-sm);}
   .card h2{margin:0 0 6px; font-size:12.5px; font-weight:700; color:var(--ink-2);}
   .hero{display:flex; align-items:baseline; gap:9px;}
-  .hero b{font-size:32px; font-weight:500; letter-spacing:-.02em; font-family:var(--mono);
-          line-height:1.1; color:var(--brand);}
+  .hero b{font-size:33px; font-weight:800; letter-spacing:-.03em;
+          font-variant-numeric:tabular-nums; line-height:1.1; color:var(--brand);}
   .hero span{font-size:13px; color:var(--ink-3);}
   .note-s{font-size:12.5px; color:var(--ink-3); margin:11px 0 0; line-height:1.5;}
   .note-s.alert{color:var(--bad); font-weight:700;}
 
   .chart{width:100%; height:auto; display:block; margin-top:12px;}
   .chart .gl{stroke:var(--line); stroke-width:1;}
-  .chart .ax{fill:var(--ink-3); font-size:8.5px; font-family:var(--mono);}
-  .chart .mn{fill:var(--ink-3); font-size:9.5px; font-family:var(--mono);}
+  .chart .ax{fill:var(--ink-3); font-size:9px; font-family:var(--sans);}
+  .chart .mn{fill:var(--ink-3); font-size:10px; font-family:var(--sans);}
   .chart .mn.now{fill:var(--ink); font-weight:700;}
   .chart .bar{fill:var(--brand);}
   .chart .stub{fill:var(--line);}
-  .chart .val{fill:var(--ink-2); font-size:9px; font-weight:500; font-family:var(--mono);}
+  .chart .val{fill:var(--ink-2); font-size:9.5px; font-weight:700; font-family:var(--sans);}
   .chart .val.in{fill:#FFFFFF;}
   .sticky-top .cnt.bad{color:var(--bad); font-weight:800;}
-  .chart .xn{fill:var(--bad); font-size:9.5px; font-weight:500; font-family:var(--mono);}
+  .chart .xn{fill:var(--bad); font-size:10px; font-weight:800; font-family:var(--sans);}
   .chart .hit{fill:transparent; cursor:pointer;}
   .chart .hit:focus{outline:none;}
   .chart .sel{fill:var(--brand-wash);}
@@ -229,9 +232,10 @@
   .rec .t b{display:block; font-size:14.5px; font-weight:800; letter-spacing:-.01em;}
   .rec .t span{font-size:12px; color:var(--ink-3);}
   .rec .rt{flex:0 0 auto; text-align:right;}
-  .rec .rt b{display:block; font-size:15px; font-weight:500; font-family:var(--mono);}
+  .rec .rt b{display:block; font-size:15.5px; font-weight:800; letter-spacing:-.01em;
+             font-variant-numeric:tabular-nums;}
   .rec .rt b.bad{color:var(--bad);}
-  .rec .rt span{font-size:11px; color:var(--ink-3); font-family:var(--mono);}
+  .rec .rt span{font-size:11.5px; color:var(--ink-3); font-variant-numeric:tabular-nums;}
 
   .rrow{display:flex; gap:10px; padding:12px 15px; border-top:1px solid var(--line);
         align-items:flex-start;}
@@ -242,7 +246,7 @@
   .bg.n{background:var(--na-bg); color:var(--na);}
   .rrow .tx{flex:1; min-width:0; font-size:14px; line-height:1.5;}
   .rrow .tx .id{font-size:11px; color:var(--ink-3); margin-right:5px;
-                font-family:var(--mono);}
+                font-variant-numeric:tabular-nums; letter-spacing:.02em;}
   .rsn{margin-top:8px; padding:10px 12px; background:var(--bad-bg); border-radius:8px;
        font-size:13px; color:var(--bad); line-height:1.5;}
   .rsn a{color:var(--bad); font-weight:700;}
