@@ -167,6 +167,77 @@
         border-radius:50%; margin:0 auto 12px; animation:sp .8s linear infinite;}
   @keyframes sp{to{transform:rotate(360deg);}}
   @media (prefers-reduced-motion:reduce){ .spin{animation:none;} .bar i{transition:none;} }
+
+  /* ---------- 대시보드 ---------- */
+  .tabs{display:flex; gap:7px; margin:0 0 16px; overflow-x:auto; padding-bottom:2px;
+        -webkit-overflow-scrolling:touch;}
+  .tabs button{
+    flex:0 0 auto; padding:8px 15px; border-radius:99px; border:1px solid var(--line-strong);
+    background:var(--ground); color:var(--ink-2); font-size:13.5px; font-weight:700;
+    font-family:inherit; cursor:pointer; white-space:nowrap;
+  }
+  .tabs button[aria-pressed="true"]{background:var(--brand); border-color:var(--brand); color:#fff;}
+
+  .card{border:1px solid var(--line-strong); border-radius:var(--radius); background:var(--ground);
+        padding:16px; margin-bottom:18px;}
+  .card h2{margin:0 0 6px; font-size:12.5px; font-weight:700; color:var(--ink-2);}
+  .hero{display:flex; align-items:baseline; gap:9px;}
+  .hero b{font-size:33px; font-weight:800; letter-spacing:-.03em; font-variant-numeric:tabular-nums;
+          line-height:1.1;}
+  .hero span{font-size:13px; color:var(--ink-3);}
+  .note-s{font-size:12.5px; color:var(--ink-3); margin:11px 0 0; line-height:1.5;}
+  .note-s.alert{color:var(--bad); font-weight:700;}
+
+  .chart{width:100%; height:auto; display:block; margin-top:12px;}
+  .chart .gl{stroke:var(--line); stroke-width:1;}
+  .chart .ax{fill:var(--ink-3); font-size:8.5px;}
+  .chart .mn{fill:var(--ink-3); font-size:9.5px;}
+  .chart .mn.now{fill:var(--ink); font-weight:700;}
+  .chart .bar{fill:var(--brand);}
+  .chart .stub{fill:var(--line);}
+  .chart .val{fill:var(--ink-2); font-size:9px; font-weight:700;}
+  .chart .val.in{fill:#FFFFFF;}
+  .sticky-top .cnt.bad{color:var(--bad); font-weight:800;}
+  .chart .xn{fill:var(--bad); font-size:9.5px; font-weight:800;}
+  .chart .hit{fill:transparent; cursor:pointer;}
+  .chart .hit:focus{outline:none;}
+  .chart .sel{fill:var(--brand-wash);}
+
+  .tipbox{margin-top:10px; padding:10px 12px; background:var(--surface-2); border-radius:9px;
+          font-size:12.5px; color:var(--ink-2); display:none;}
+  .tipbox.on{display:block;}
+  .tipbox b{color:var(--ink);}
+
+  .rec{display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+       padding:13px 14px; border:1px solid var(--line-strong); border-radius:var(--radius);
+       background:var(--ground); font-family:inherit; cursor:pointer; color:var(--ink);
+       margin-bottom:10px;}
+  .rec .cy{width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:var(--brand-wash);
+           color:var(--brand-dark); display:flex; align-items:center; justify-content:center;
+           font-weight:800; font-size:13px;}
+  .rec .t{flex:1; min-width:0;}
+  .rec .t b{display:block; font-size:14.5px; font-weight:800; letter-spacing:-.01em;}
+  .rec .t span{font-size:12px; color:var(--ink-3);}
+  .rec .rt{flex:0 0 auto; text-align:right;}
+  .rec .rt b{display:block; font-size:15px; font-weight:800; font-variant-numeric:tabular-nums;}
+  .rec .rt b.bad{color:var(--bad);}
+  .rec .rt span{font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums;}
+
+  .rrow{display:flex; gap:10px; padding:12px 15px; border-top:1px solid var(--line);
+        align-items:flex-start;}
+  .rrow .bg{flex:0 0 auto; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px;
+            margin-top:1px; white-space:nowrap;}
+  .bg.o{background:var(--ok-bg); color:var(--ok);}
+  .bg.x{background:var(--bad-bg); color:var(--bad);}
+  .bg.n{background:var(--na-bg); color:var(--na);}
+  .rrow .tx{flex:1; min-width:0; font-size:14px; line-height:1.5;}
+  .rrow .tx .id{font-size:11px; color:var(--ink-3); margin-right:5px;
+                font-variant-numeric:tabular-nums;}
+  .rsn{margin-top:8px; padding:10px 12px; background:var(--bad-bg); border-radius:8px;
+       font-size:13px; color:var(--bad); line-height:1.5;}
+  .rsn a{color:var(--bad); font-weight:700;}
+  .empty{text-align:center; padding:36px 16px; color:var(--ink-3); font-size:14px; line-height:1.6;}
+  .subhead{font-size:13px; font-weight:800; color:var(--ink-2); margin:0 0 10px;}
 </style>
 </head>
 <body>
@@ -202,7 +273,9 @@
     <h1>어떤 점검을 하시겠습니까?</h1>
     <p class="desc" id="menu-date">—</p>
     <div class="cycles" id="cycles"></div>
-    <div style="height:26px"></div>
+    <div style="height:22px"></div>
+    <button class="btn ghost" id="btn-report">📊 점검 결과 보기</button>
+    <div style="height:10px"></div>
     <button class="btn ghost" id="btn-logout">매장 변경</button>
   </div>
 </div>
@@ -246,7 +319,78 @@
       <div><b id="d-x" style="color:var(--bad)">0</b><span>미이행</span></div>
       <div><b id="d-n" style="color:var(--na)">0</b><span>해당없음</span></div>
     </div>
-    <button class="btn" id="btn-home">처음으로</button>
+    <button class="btn" id="btn-done-report">방금 제출한 내용 보기</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" id="btn-home">처음으로</button>
+  </div>
+</div>
+
+<!-- ============ 5. 점검 결과 대시보드 ============ -->
+<div class="screen" id="s-report">
+  <div class="brandbar">
+    <span class="logo" id="rp-store">—</span>
+    <span class="who">점검 결과</span>
+  </div>
+  <div class="pad">
+    <div class="tabs" id="rp-tabs"></div>
+
+    <div class="load on" id="rp-load"><div class="spin"></div>기록을 불러오는 중…</div>
+
+    <div id="rp-body" style="display:none;">
+      <div class="card">
+        <h2 id="rp-year">— 이행률</h2>
+        <div class="hero">
+          <b id="rp-rate">—</b>
+          <span id="rp-sub">—</span>
+        </div>
+        <svg class="chart" id="rp-chart" viewBox="0 0 348 150" role="img"
+             aria-label="월별 이행률 막대 그래프"></svg>
+        <div class="tipbox" id="rp-tip"></div>
+        <p class="note-s" id="rp-note">—</p>
+      </div>
+
+      <p class="subhead">제출한 점검 (최근 순)</p>
+      <div id="rp-list"></div>
+    </div>
+
+    <div style="height:12px"></div>
+    <button class="btn ghost" id="btn-rp-back">뒤로</button>
+    <div class="msg err" id="rp-msg"></div>
+  </div>
+</div>
+
+<!-- ============ 6. 제출 1건 상세 ============ -->
+<div class="screen" id="s-detail">
+  <div class="sticky-top">
+    <div class="row">
+      <span class="ttl" id="dt-title">—</span>
+      <span class="cnt" id="dt-rate">—</span>
+    </div>
+    <div class="bar"><i id="dt-bar"></i></div>
+  </div>
+
+  <div class="load on" id="dt-load"><div class="spin"></div>항목별 결과를 불러오는 중…</div>
+
+  <div id="dt-wrap" style="display:none;">
+    <div class="pad" style="padding-bottom:0;">
+      <p class="desc" id="dt-sub" style="margin-bottom:14px;">—</p>
+      <div class="sum" style="margin-top:0;">
+        <div><b id="dt-o" style="color:var(--ok)">0</b><span>이행</span></div>
+        <div><b id="dt-x" style="color:var(--bad)">0</b><span>미이행</span></div>
+        <div><b id="dt-n" style="color:var(--na)">0</b><span>해당없음</span></div>
+      </div>
+      <div class="tabs" id="dt-tabs"></div>
+    </div>
+    <div id="dt-body"></div>
+    <div class="pad" id="dt-note-wrap" style="display:none; padding-top:0;">
+      <p class="subhead">전체 특이사항</p>
+      <div class="card" style="margin-bottom:0;"><span id="dt-note"></span></div>
+    </div>
+  </div>
+
+  <div class="pad" style="padding-top:14px;">
+    <button class="btn ghost" id="btn-dt-back">목록으로</button>
+    <div class="msg err" id="dt-msg"></div>
   </div>
 </div>
 
@@ -725,6 +869,330 @@ function 완료화면(res, 집계){
     상태.매장 + ' · ' + 상태.오늘 + ' · ' + 상태.담당자 +
     (율 !== null ? '  |  이행률 ' + 율 + '%' : '');
   화면('s-done');
+}
+
+/* ==================================================================
+ *  점검 결과 대시보드
+ *  · 로그인한 매장의 기록만 조회합니다
+ *  · trend  : 월별 이행률 추이
+ *  · history: 제출 목록
+ *  · detail : 제출 1건의 항목별 이행 / 미이행 / 해당없음
+ * ================================================================== */
+var 리포트 = { 주기:'전체', 목록:[], 추이:null, 상세:null, 필터:'전체', 자동:false };
+
+$('btn-report').onclick      = function(){ 대시보드열기('전체', false); };
+$('btn-done-report').onclick = function(){ 대시보드열기(상태.주기 || '전체', true); };
+$('btn-rp-back').onclick     = function(){ 메뉴열기(); };
+$('btn-dt-back').onclick     = function(){ 화면('s-report'); };
+
+function 대시보드열기(주기, 자동){
+  리포트.주기 = 주기 || '전체';
+  리포트.자동 = !!자동;
+  $('rp-store').textContent = 상태.매장;
+  알림($('rp-msg'), '');
+
+  var box = $('rp-tabs');
+  box.innerHTML = '';
+  ['전체','일일','주간','월간'].forEach(function(k){
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = k;
+    b.setAttribute('aria-pressed', k === 리포트.주기 ? 'true' : 'false');
+    b.onclick = function(){
+      리포트.주기 = k; 리포트.자동 = false;
+      var all = box.querySelectorAll('button');
+      for (var i=0;i<all.length;i++) all[i].setAttribute('aria-pressed','false');
+      b.setAttribute('aria-pressed','true');
+      리포트불러오기();
+    };
+    box.appendChild(b);
+  });
+
+  화면('s-report');
+  리포트불러오기();
+}
+
+function 리포트불러오기(){
+  $('rp-load').classList.add('on');
+  $('rp-body').style.display = 'none';
+  $('rp-tip').classList.remove('on');
+  알림($('rp-msg'), '');
+
+  var 공통 = { 매장:상태.매장, 코드:상태.코드, 주기:리포트.주기 };
+  var 연 = Number(String(상태.오늘 || '').slice(0,4)) || new Date().getFullYear();
+
+  Promise.all([
+    조회({ action:'trend',   매장:공통.매장, 코드:공통.코드, 주기:공통.주기, 연:연 }),
+    조회({ action:'history', 매장:공통.매장, 코드:공통.코드, 주기:공통.주기, 개수:20 })
+  ]).then(function(r){
+    $('rp-load').classList.remove('on');
+    var t = r[0], h = r[1];
+    if (!t || !t.ok) throw new Error((t && t.msg) || '추이를 받지 못했습니다.');
+    if (!h || !h.ok) throw new Error((h && h.msg) || '제출 목록을 받지 못했습니다.');
+
+    리포트.추이 = t;
+    리포트.목록 = h.목록 || [];
+    $('rp-body').style.display = '';
+    추이그리기(t);
+    목록그리기(리포트.목록);
+
+    if (리포트.자동 && 리포트.목록.length){
+      리포트.자동 = false;
+      상세열기(리포트.목록[0].키);
+    }
+  }).catch(function(err){
+    $('rp-load').classList.remove('on');
+    알림($('rp-msg'), err.message);
+  });
+}
+
+/* ---------- 월별 이행률 막대 ----------
+ * 세로축은 0~100% 를 그대로 씁니다 (기준선을 잘라 차이를 부풀리지 않습니다).
+ * 이행률은 대체로 100% 근처라 변화가 작으므로,
+ * 실제 신호인 "미이행 건수"를 막대 위에 빨간 숫자로 함께 표시합니다.
+ * ------------------------------------ */
+function 추이그리기(t){
+  var 월별 = t.월별 || [];
+  var L=28, R=6, TOP=26, BASE=118, W=348;
+  var 폭 = W - L - R;
+  var step = 폭 / 12;
+  var 막대폭 = Math.max(10, step - 8);
+  var 높이 = BASE - TOP;
+
+  var 이번달 = Number(String(상태.오늘 || '').slice(5,7)) || 0;
+
+  /* 라벨을 붙일 달 : 기록이 있는 마지막 달, 그리고 이행률이 가장 낮은 달 */
+  var 있는달 = 월별.filter(function(m){ return m.이행률 !== null; });
+  var 최신 = 있는달.length ? 있는달[있는달.length-1].월 : 0;
+  var 최저 = 0, 최저값 = 101;
+  있는달.forEach(function(m){ if (m.이행률 < 최저값){ 최저값 = m.이행률; 최저 = m.월; } });
+
+  var g = [];
+  /* 격자 + 축 라벨 */
+  [0, 50, 100].forEach(function(p){
+    var y = BASE - 높이 * p / 100;
+    g.push('<line class="gl" x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'"></line>');
+    g.push('<text class="ax" x="'+(L-5)+'" y="'+(y+3)+'" text-anchor="end">'+(p===100?'100%':p)+'</text>');
+  });
+
+  월별.forEach(function(m, i){
+    var x = L + step * i + (step - 막대폭)/2;
+
+    if (m.이행률 === null){
+      g.push('<rect class="stub" x="'+x.toFixed(1)+'" y="'+(BASE-3)+'" width="'+막대폭.toFixed(1)+'" height="3" rx="1.5"></rect>');
+    } else {
+      var h = Math.max(3, 높이 * m.이행률 / 100);
+      var y = BASE - h;
+      g.push('<path class="bar" d="'+막대경로(x, y, 막대폭, h)+'"></path>');
+
+      if (m.월 === 최신 || m.월 === 최저){
+        g.push('<text class="val in" x="'+(x+막대폭/2).toFixed(1)+'" y="'+(y+13)+'" text-anchor="middle">'+
+               Math.round(m.이행률)+'</text>');
+      }
+      if (m.미이행 > 0){
+        g.push('<text class="xn" x="'+(x+막대폭/2).toFixed(1)+'" y="'+(y-4)+'" text-anchor="middle">✕'+m.미이행+'</text>');
+      }
+    }
+
+    g.push('<text class="mn'+(m.월===이번달?' now':'')+'" x="'+(L+step*i+step/2).toFixed(1)+
+           '" y="'+(BASE+16)+'" text-anchor="middle">'+m.월+'</text>');
+
+    g.push('<rect class="hit" x="'+(L+step*i).toFixed(1)+'" y="'+(TOP-12)+'" width="'+step.toFixed(1)+
+           '" height="'+(BASE-TOP+28)+'" data-m="'+i+'"></rect>');
+  });
+
+  var svg = $('rp-chart');
+  svg.innerHTML = g.join('');
+  var hits = svg.querySelectorAll('.hit');
+  for (var i=0;i<hits.length;i++){
+    (function(el){
+      el.onclick = function(){ 툴팁(월별[Number(el.getAttribute('data-m'))]); };
+    })(hits[i]);
+  }
+
+  /* 헤드라인 */
+  var 합 = t.합계 || {};
+  $('rp-year').textContent = t.연 + '년 ' + (리포트.주기 === '전체' ? '전체' : 리포트.주기) + ' 이행률';
+  $('rp-rate').textContent = (합.이행률 === null || 합.이행률 === undefined) ? '—' : 합.이행률 + '%';
+  $('rp-sub').textContent  = '제출 ' + (합.제출 || 0) + '건 · 이행 ' + (합.이행 || 0) +
+                             ' · 미이행 ' + (합.미이행 || 0);
+
+  var 문제달 = 월별.filter(function(m){ return m.미이행 > 0; })
+                   .map(function(m){ return m.월 + '월(' + m.미이행 + '건)'; });
+  var 빈달 = 월별.filter(function(m){ return m.건수 === 0 && m.월 <= (이번달 || 12); })
+                 .map(function(m){ return m.월 + '월'; });
+
+  var note = $('rp-note');
+  if (문제달.length){
+    note.className = 'note-s alert';
+    note.textContent = '미이행이 있었던 달 — ' + 문제달.join(', ');
+  } else if (빈달.length){
+    note.className = 'note-s';
+    note.textContent = '아직 제출 기록이 없는 달 — ' + 빈달.join(', ');
+  } else {
+    note.className = 'note-s';
+    note.textContent = '막대를 누르면 그 달의 숫자가 아래에 표시됩니다.';
+  }
+}
+
+function 막대경로(x, y, w, h){
+  var r = Math.min(4, h/2, w/2);
+  return 'M' + x.toFixed(1) + ',' + (y+h).toFixed(1) +
+         'V' + (y+r).toFixed(1) +
+         'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + (-r) +
+         'h' + (w-2*r).toFixed(1) +
+         'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + r +
+         'V' + (y+h).toFixed(1) + 'Z';
+}
+
+function 툴팁(m){
+  var box = $('rp-tip');
+  if (!m){ box.classList.remove('on'); return; }
+  if (m.건수 === 0){
+    box.innerHTML = '<b>' + m.월 + '월</b> · 제출 기록 없음';
+  } else {
+    box.innerHTML = '<b>' + m.월 + '월</b> · 제출 ' + m.건수 + '건 · 이행률 ' +
+                    (m.이행률 === null ? '—' : m.이행률 + '%') +
+                    ' · 이행 ' + m.이행 + ' / 미이행 ' + m.미이행;
+  }
+  box.classList.add('on');
+}
+
+/* ---------- 제출 목록 ---------- */
+function 목록그리기(목록){
+  var box = $('rp-list');
+  box.innerHTML = '';
+
+  if (!목록.length){
+    box.innerHTML = '<div class="empty">아직 제출한 점검이 없습니다.<br>' +
+                    '점검을 완료하고 제출하면 여기에 쌓입니다.</div>';
+    return;
+  }
+
+  목록.forEach(function(r){
+    var b = document.createElement('button');
+    b.className = 'rec'; b.type = 'button';
+    var 율 = (r.이행률 === null) ? '—' : r.이행률 + '%';
+    b.innerHTML =
+      '<span class="cy">' + esc(r.주기) + '</span>' +
+      '<span class="t"><b>' + esc(r.점검일) + '</b>' +
+        '<span>' + esc(r.시각) + ' · ' + esc(r.담당자) + '</span></span>' +
+      '<span class="rt"><b' + (r.미이행 > 0 ? ' class="bad"' : '') + '>' + 율 + '</b>' +
+        '<span>○' + r.이행 + ' ✕' + r.미이행 + ' −' + r.해당없음 + '</span></span>';
+    b.onclick = function(){ 상세열기(r.키); };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- 제출 1건 상세 ---------- */
+function 상세열기(키){
+  리포트.필터 = '전체';
+  $('dt-load').classList.add('on');
+  $('dt-wrap').style.display = 'none';
+  $('dt-title').textContent = '점검 상세';
+  $('dt-rate').textContent = '—';
+  $('dt-bar').style.width = '0%';
+  알림($('dt-msg'), '');
+  화면('s-detail');
+
+  조회({ action:'detail', 매장:상태.매장, 코드:상태.코드, 키:키 }).then(function(res){
+    $('dt-load').classList.remove('on');
+    if (!res || !res.ok) throw new Error((res && res.msg) || '상세를 받지 못했습니다.');
+    리포트.상세 = res;
+    $('dt-wrap').style.display = '';
+    상세그리기(res);
+  }).catch(function(err){
+    $('dt-load').classList.remove('on');
+    알림($('dt-msg'), err.message);
+  });
+}
+
+function 상세그리기(res){
+  var i = res.정보;
+  $('dt-title').textContent = i.주기 + ' 점검 · ' + i.점검일;
+  var rateEl = $('dt-rate');
+  rateEl.textContent = (i.이행률 === null) ? '—' : i.이행률 + '%';
+  rateEl.className = 'cnt' + (i.미이행 > 0 ? ' bad' : '');
+  $('dt-bar').style.width   = (i.이행률 === null ? 0 : i.이행률) + '%';
+  $('dt-sub').textContent   = i.매장 + ' · ' + i.시각 + ' 제출 · ' + i.담당자 +
+                              (i.소요초 ? '  |  소요 ' + Math.round(i.소요초/60) + '분' : '');
+  $('dt-o').textContent = i.이행;
+  $('dt-x').textContent = i.미이행;
+  $('dt-n').textContent = i.해당없음;
+
+  var 특 = $('dt-note-wrap');
+  if (i.특이사항){
+    $('dt-note').textContent = i.특이사항;
+    특.style.display = '';
+  } else {
+    특.style.display = 'none';
+  }
+
+  var tabs = $('dt-tabs');
+  tabs.innerHTML = '';
+  var 목록 = [['전체','전체 ' + (i.이행 + i.미이행 + i.해당없음) + '개']];
+  if (i.미이행 > 0) 목록.push(['미이행','미이행 ' + i.미이행 + '건만']);
+  목록.forEach(function(p){
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = p[1];
+    b.setAttribute('aria-pressed', 리포트.필터 === p[0] ? 'true' : 'false');
+    b.onclick = function(){
+      리포트.필터 = p[0];
+      var all = tabs.querySelectorAll('button');
+      for (var k=0;k<all.length;k++) all[k].setAttribute('aria-pressed','false');
+      b.setAttribute('aria-pressed','true');
+      항목목록그리기(res);
+    };
+    tabs.appendChild(b);
+  });
+
+  항목목록그리기(res);
+}
+
+function 항목목록그리기(res){
+  var body = $('dt-body');
+  body.innerHTML = '';
+  var 보인것 = 0;
+
+  (res.섹션 || []).forEach(function(그룹){
+    var 대상 = 그룹.항목.filter(function(a){
+      return 리포트.필터 === '전체' || a.결과 === 'X';
+    });
+    if (!대상.length) return;
+    보인것 += 대상.length;
+
+    var sec = document.createElement('div');
+    sec.className = 'sec';
+    sec.innerHTML = '<h3>' + esc(그룹.섹션) +
+                    ' <span class="n">' + 대상.length + '개</span></h3>';
+
+    대상.forEach(function(a){
+      var 등급 = (a.결과 === 'O') ? 'o' : (a.결과 === 'X') ? 'x' : 'n';
+      var 글 = (a.결과 === 'O') ? '이행' : (a.결과 === 'X') ? '미이행' : '해당없음';
+
+      var row = document.createElement('div');
+      row.className = 'rrow';
+      var html =
+        '<span class="bg ' + 등급 + '">' + 글 + '</span>' +
+        '<span class="tx"><span class="id">' + esc(a.id) + '</span>' + esc(a.내용);
+      if (a.결과 === 'X'){
+        html += '<span class="rsn" style="display:block;">' +
+                (a.사유 ? esc(a.사유) : '사유 미기재') +
+                (a.사진 ? ' <a href="' + esc(a.사진) + '" target="_blank" rel="noopener">사진 보기 ↗</a>' : '') +
+                '</span>';
+      }
+      html += '</span>';
+      row.innerHTML = html;
+      sec.appendChild(row);
+    });
+
+    body.appendChild(sec);
+  });
+
+  if (!보인것){
+    body.innerHTML = '<div class="empty">' +
+      (리포트.필터 === '미이행' ? '미이행 항목이 없습니다. 전부 이행 처리되었습니다.'
+                               : '표시할 항목이 없습니다.') + '</div>';
+  }
 }
 </script>
 </body>
